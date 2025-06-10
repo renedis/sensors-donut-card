@@ -25,18 +25,20 @@ A customizable Lovelace card to display any numeric sensor as a modern donut cha
 
 ```yaml
 type: custom:sensor-donut-card
-title: System Monitoring
+title: System Monitoring       # optional
 donuts:
-  - name: CPU Usage
-    entity: sensor.processor_use
-    unit: "%"
-    max: 100
-    size: 120
-    thickness: 12
+  - name: CPU Fan              # name to show of sensor
+    entity: sensor.cpu_fan     # entity to use
+    unit: "RPM"                # unit to use
+    max: 6000                  # max value to fill the donut chard
+    size: 100                  # e.g. 120 or 150 is also possible
+    thickness: 4               # how thick the line 
+    value_position: inside     # inside/left/right/above/below
+    label_position: below      # inside/left/right/above/below
     color_gradient:
-      - from: 0
+      - from: 0                # set base color
         color: "#2ecc71"
-      - from: 60
+      - from: 2000             # change color after this value is reached
         color: "#f1c40f"
-      - from: 80
+      - from: 4500             # change color again after this value is reached
         color: "#e74c3c"
