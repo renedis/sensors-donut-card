@@ -1,0 +1,19 @@
+{
+  "name": "sensor-donut-card",
+  "version": "1.0.0",
+  "description": "A customizable Lovelace card to display numeric sensors as modern donut charts",
+  "main": "dist/sensor-donut-card.js",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w"
+  },
+  "keywords": ["home-assistant", "lovelace", "card", "donut", "chart", "sensor"],
+  "author": "renedis",
+  "license": "MIT",
+  "devDependencies": {
+    "rollup": "^3.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "typescript": "^5.0.0"
+  }
+}
