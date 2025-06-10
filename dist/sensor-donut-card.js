@@ -1,5 +1,5 @@
 /**
- * Sensor Donut Card for Home Assistant v1.1.1
+ * Sensor Donut Card for Home Assistant v1.1.2
  * A customizable Lovelace card to display numeric sensors as donut charts
  */
 
@@ -33,6 +33,7 @@ class SensorDonutCard extends LitElement {
         gap: var(--donut-gap, 16px);
         grid-template-columns: repeat(var(--columns, 1), 1fr);
         justify-items: center;
+        align-items: center;
       }
 
       .donut-item {
@@ -42,6 +43,7 @@ class SensorDonutCard extends LitElement {
         text-align: center;
         position: relative;
         justify-self: center;
+        align-self: center;
       }
 
       .donut-container {
@@ -49,11 +51,13 @@ class SensorDonutCard extends LitElement {
         display: flex;
         align-items: center;
         justify-content: center;
+        margin: 0 auto;
       }
 
       .donut-svg {
         transform: rotate(-90deg);
         display: block;
+        margin: 0 auto;
       }
 
       .donut-background {
@@ -204,6 +208,11 @@ class SensorDonutCard extends LitElement {
         font-size: 11px;
         line-height: 1.2;
       }
+
+      /* Perfect centering fix */
+      .donut-svg circle {
+        transform-origin: center;
+      }
     `;
   }
 
@@ -292,6 +301,10 @@ class SensorDonutCard extends LitElement {
             const strokeDasharray = this.createDonutPath(size, thickness, percentage);
             const sizeClass = this.getSizeClass(size);
 
+            // Calculate exact center coordinates
+            const centerX = size / 2;
+            const centerY = size / 2;
+
             // Create value content with separate unit styling
             const valueContent = html`
               ${value}${unit ? html`<span class="donut-unit">${unit}</span>` : ''}
@@ -313,22 +326,25 @@ class SensorDonutCard extends LitElement {
                     class="donut-svg" 
                     width="${size}" 
                     height="${size}"
+                    viewBox="0 0 ${size} ${size}"
                     style="--donut-background-color: ${backgroundColor};"
                   >
                     <!-- Background circle -->
                     <circle
                       class="donut-background"
-                      cx="${size / 2}"
-                      cy="${size / 2}"
+                      cx="${centerX}"
+                      cy="${centerY}"
                       r="${radius}"
+                      stroke-width="${thickness}"
                     />
                     <!-- Progress circle -->
                     <circle
                       class="donut-progress"
-                      cx="${size / 2}"
-                      cy="${size / 2}"
+                      cx="${centerX}"
+                      cy="${centerY}"
                       r="${radius}"
                       stroke="${color}"
+                      stroke-width="${thickness}"
                       stroke-dasharray="${strokeDasharray}"
                       stroke-dashoffset="0"
                     />
@@ -379,7 +395,7 @@ window.customCards.push({
 
 // Console info
 console.info(
-  `%c SENSOR-DONUT-CARD %c v1.1.1 `,
+  `%c SENSOR-DONUT-CARD %c v1.1.2 `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray'
 );
