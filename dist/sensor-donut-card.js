@@ -1,5 +1,5 @@
 /**
- * Sensor Donut Card for Home Assistant v1.1.0
+ * Sensor Donut Card for Home Assistant v1.1.1
  * A customizable Lovelace card to display numeric sensors as donut charts
  */
 
@@ -32,6 +32,7 @@ class SensorDonutCard extends LitElement {
         display: grid;
         gap: var(--donut-gap, 16px);
         grid-template-columns: repeat(var(--columns, 1), 1fr);
+        justify-items: center;
       }
 
       .donut-item {
@@ -40,15 +41,19 @@ class SensorDonutCard extends LitElement {
         align-items: center;
         text-align: center;
         position: relative;
+        justify-self: center;
       }
 
       .donut-container {
         position: relative;
-        display: inline-block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .donut-svg {
         transform: rotate(-90deg);
+        display: block;
       }
 
       .donut-background {
@@ -77,6 +82,8 @@ class SensorDonutCard extends LitElement {
         font-weight: 500;
         color: var(--primary-text-color, #ccc);
         pointer-events: none;
+        width: calc(var(--donut-size, 120px) - var(--donut-thickness, 8px) * 2 - 20px);
+        text-align: center;
       }
 
       .donut-value {
@@ -86,6 +93,8 @@ class SensorDonutCard extends LitElement {
         display: flex;
         align-items: baseline;
         gap: 2px;
+        justify-content: center;
+        white-space: nowrap;
       }
 
       .donut-unit {
@@ -96,9 +105,14 @@ class SensorDonutCard extends LitElement {
       }
 
       .donut-name {
-        font-size: 12px;
-        margin-top: 4px;
+        font-size: 10px;
+        margin-top: 2px;
         opacity: 0.8;
+        line-height: 1.1;
+        word-break: break-word;
+        hyphens: auto;
+        max-width: 100%;
+        overflow-wrap: break-word;
       }
 
       .donut-label {
@@ -109,6 +123,11 @@ class SensorDonutCard extends LitElement {
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-wrap: wrap;
+        text-align: center;
+        max-width: calc(var(--donut-size, 120px) + 20px);
+        word-break: break-word;
+        hyphens: auto;
       }
 
       .donut-value-external {
@@ -119,6 +138,7 @@ class SensorDonutCard extends LitElement {
         align-items: baseline;
         gap: 2px;
         justify-content: center;
+        white-space: nowrap;
       }
 
       .positioned-left {
@@ -168,6 +188,22 @@ class SensorDonutCard extends LitElement {
         padding: 8px;
         text-align: center;
       }
+
+      /* Size-specific adjustments */
+      .size-small .donut-name {
+        font-size: 9px;
+        line-height: 1.0;
+      }
+
+      .size-medium .donut-name {
+        font-size: 10px;
+        line-height: 1.1;
+      }
+
+      .size-large .donut-name {
+        font-size: 11px;
+        line-height: 1.2;
+      }
     `;
   }
 
@@ -209,6 +245,12 @@ class SensorDonutCard extends LitElement {
     }
   }
 
+  getSizeClass(size) {
+    if (size <= 80) return 'size-small';
+    if (size <= 140) return 'size-medium';
+    return 'size-large';
+  }
+
   render() {
     if (!this.config || !this.hass) return html``;
 
@@ -248,6 +290,7 @@ class SensorDonutCard extends LitElement {
 
             const radius = (size - thickness) / 2;
             const strokeDasharray = this.createDonutPath(size, thickness, percentage);
+            const sizeClass = this.getSizeClass(size);
 
             // Create value content with separate unit styling
             const valueContent = html`
@@ -261,13 +304,16 @@ class SensorDonutCard extends LitElement {
             `;
 
             return html`
-              <div class="donut-item">
-                <div class="donut-container">
+              <div class="donut-item ${sizeClass}">
+                <div 
+                  class="donut-container"
+                  style="--donut-size: ${size}px; --donut-thickness: ${thickness}px;"
+                >
                   <svg 
                     class="donut-svg" 
                     width="${size}" 
                     height="${size}"
-                    style="--donut-thickness: ${thickness}px; --donut-background-color: ${backgroundColor};"
+                    style="--donut-background-color: ${backgroundColor};"
                   >
                     <!-- Background circle -->
                     <circle
@@ -333,7 +379,7 @@ window.customCards.push({
 
 // Console info
 console.info(
-  `%c SENSOR-DONUT-CARD %c v1.1.0 `,
+  `%c SENSOR-DONUT-CARD %c v1.1.1 `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray'
 );
