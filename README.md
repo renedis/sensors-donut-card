@@ -1,5 +1,4 @@
-# Create README.md
-readme_md = '''# Sensor Donut Card
+# Sensor Donut Card
 
 A customizable Lovelace card to display any numeric sensor as a modern donut chart with gradient colors and flexible positioning options.
 
