@@ -27,7 +27,7 @@ A customizable Lovelace card to display any numeric sensor as a modern donut cha
 type: custom:sensor-donut-card
 title: System Monitoring       # optional
 donuts:
-  - name: CPU Fan              # name to show of sensor
+  - name: CPU Fan              # name (label) to show of sensor
     entity: sensor.cpu_fan     # entity to use
     unit: "RPM"                # unit to use
     max: 6000                  # max value to fill the donut chard
