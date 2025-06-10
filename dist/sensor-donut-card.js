@@ -1,5 +1,5 @@
 /**
- * Sensor Donut Card for Home Assistant
+ * Sensor Donut Card for Home Assistant v1.1.0
  * A customizable Lovelace card to display numeric sensors as donut charts
  */
 
@@ -39,6 +39,7 @@ class SensorDonutCard extends LitElement {
         flex-direction: column;
         align-items: center;
         text-align: center;
+        position: relative;
       }
 
       .donut-container {
@@ -82,6 +83,16 @@ class SensorDonutCard extends LitElement {
         font-size: 16px;
         font-weight: 600;
         line-height: 1;
+        display: flex;
+        align-items: baseline;
+        gap: 2px;
+      }
+
+      .donut-unit {
+        font-size: 50%;
+        opacity: 0.6;
+        color: var(--secondary-text-color, #888);
+        font-weight: 400;
       }
 
       .donut-name {
@@ -94,10 +105,49 @@ class SensorDonutCard extends LitElement {
         margin-top: 8px;
         font-size: 14px;
         font-weight: 500;
-        color: var(--primary-text-color, #ccc);
+        color: var(--secondary-text-color, #888);
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+
+      .donut-value-external {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--secondary-text-color, #888);
+        display: flex;
+        align-items: baseline;
+        gap: 2px;
+        justify-content: center;
+      }
+
+      .positioned-left {
+        position: absolute;
+        left: -60px;
+        top: 50%;
+        transform: translateY(-50%);
+        text-align: right;
+      }
+
+      .positioned-right {
+        position: absolute;
+        right: -60px;
+        top: 50%;
+        transform: translateY(-50%);
+        text-align: left;
+      }
+
+      .positioned-above {
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+      }
+
+      .positioned-below {
+        margin-top: 8px;
+        text-align: center;
       }
 
       .icon {
@@ -140,6 +190,25 @@ class SensorDonutCard extends LitElement {
     return strokeDasharray;
   }
 
+  renderPositionedElement(content, position, isLabel = false) {
+    const baseClass = isLabel ? 'donut-label' : 'donut-value-external';
+
+    switch(position) {
+      case 'left':
+        return html`<div class="${baseClass} positioned-left">${content}</div>`;
+      case 'right':
+        return html`<div class="${baseClass} positioned-right">${content}</div>`;
+      case 'above':
+        return html`<div class="${baseClass} positioned-above">${content}</div>`;
+      case 'below':
+        return html`<div class="${baseClass} positioned-below">${content}</div>`;
+      case 'inside':
+        return null; // Will be handled in center
+      default:
+        return html`<div class="${baseClass} positioned-below">${content}</div>`;
+    }
+  }
+
   render() {
     if (!this.config || !this.hass) return html``;
 
@@ -161,15 +230,17 @@ class SensorDonutCard extends LitElement {
 
             const raw = parseFloat(stateObj.state);
             const value = isNaN(raw) ? 0 : raw;
-            const unit = donut.unit || stateObj.attributes.unit_of_measurement || '';
+            const unit = donut.unit !== undefined ? donut.unit : (stateObj.attributes.unit_of_measurement || '');
             const max = donut.max || 100;
             const min = donut.min || 0;
             const size = donut.size || 120;
             const thickness = donut.thickness || 8;
             const showValue = donut.show_value !== false;
             const showName = donut.show_name !== false;
-            const valuePosition = donut.value_position || 'center';
-            const namePosition = donut.name_position || 'bottom';
+
+            // New positioning options
+            const valuePosition = donut.value_position || 'inside';
+            const labelPosition = donut.label_position || 'below';
 
             const percentage = Math.min(Math.max(((value - min) / (max - min)) * 100, 0), 100);
             const color = this.computeColor(donut, value);
@@ -177,6 +248,17 @@ class SensorDonutCard extends LitElement {
 
             const radius = (size - thickness) / 2;
             const strokeDasharray = this.createDonutPath(size, thickness, percentage);
+
+            // Create value content with separate unit styling
+            const valueContent = html`
+              ${value}${unit ? html`<span class="donut-unit">${unit}</span>` : ''}
+            `;
+
+            // Create label content
+            const labelContent = html`
+              ${donut.icon ? html`<ha-icon class="icon" icon="${donut.icon}"></ha-icon>` : ''}
+              ${donut.name}
+            `;
 
             return html`
               <div class="donut-item">
@@ -206,27 +288,24 @@ class SensorDonutCard extends LitElement {
                     />
                   </svg>
 
-                  ${valuePosition === 'center' || namePosition === 'center' ? html`
+                  <!-- Center content for 'inside' positioning -->
+                  ${valuePosition === 'inside' || labelPosition === 'inside' ? html`
                     <div class="donut-center">
-                      ${showValue && valuePosition === 'center' ? html`
-                        <div class="donut-value">${value}${unit}</div>
+                      ${showValue && valuePosition === 'inside' ? html`
+                        <div class="donut-value">${valueContent}</div>
                       ` : ''}
-                      ${showName && namePosition === 'center' ? html`
+                      ${showName && labelPosition === 'inside' ? html`
                         <div class="donut-name">${donut.name}</div>
                       ` : ''}
                     </div>
                   ` : ''}
-                </div>
 
-                ${(showName && namePosition === 'bottom') || (showValue && valuePosition === 'bottom') ? html`
-                  <div class="donut-label">
-                    ${donut.icon ? html`<ha-icon class="icon" icon="${donut.icon}"></ha-icon>` : ''}
-                    <div>
-                      ${showName && namePosition === 'bottom' ? html`<div>${donut.name}</div>` : ''}
-                      ${showValue && valuePosition === 'bottom' ? html`<div>${value}${unit}</div>` : ''}
-                    </div>
-                  </div>
-                ` : ''}
+                  <!-- Positioned elements -->
+                  ${showValue && valuePosition !== 'inside' ? 
+                    this.renderPositionedElement(valueContent, valuePosition, false) : ''}
+                  ${showName && labelPosition !== 'inside' ? 
+                    this.renderPositionedElement(labelContent, labelPosition, true) : ''}
+                </div>
               </div>
             `;
           })}
@@ -254,7 +333,7 @@ window.customCards.push({
 
 // Console info
 console.info(
-  `%c SENSOR-DONUT-CARD %c v1.0.0 `,
+  `%c SENSOR-DONUT-CARD %c v1.1.0 `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray'
 );
