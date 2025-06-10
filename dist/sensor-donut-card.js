@@ -3,7 +3,9 @@
  * A customizable Lovelace card to display numeric sensors as donut charts
  */
 
-import { LitElement, html, css } from 'lit-element';
+const LitElement = Object.getPrototypeOf(customElements.get("ha-panel-lovelace"));
+const html = LitElement.prototype.html;
+const css = LitElement.prototype.css;
 
 class SensorDonutCard extends LitElement {
   static get properties() {
