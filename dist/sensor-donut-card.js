@@ -275,6 +275,15 @@ class SensorDonutCard extends LitElement {
     return '0px';
   }
 
+  _handleDonutClick(entity) {
+    const event = new Event('hass-more-info', {
+      bubbles: true,
+      composed: true,
+    });
+    event.detail = { entityId: entity };
+    this.dispatchEvent(event);
+  }
+
   render() {
     if (!this.config || !this.hass) return html``;
 
@@ -344,7 +353,8 @@ class SensorDonutCard extends LitElement {
               <div class="donut-item ${sizeClass} ${hasManualAlign ? 'manual-align' : ''}">
                 <div 
                   class="donut-container"
-                  style="--donut-size: ${size}px; --donut-thickness: ${thickness}px; ${alignmentStyle}"
+                  style="--donut-size: ${size}px; --donut-thickness: ${thickness}px; ${alignmentStyle} cursor: pointer;"
+                @click="${() => this._handleDonutClick(donut.entity)}"
                 >
                   <svg 
                     class="donut-svg" 
