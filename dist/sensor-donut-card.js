@@ -1,5 +1,5 @@
 /**
- * Sensor Donut Card for Home Assistant v1.2.0
+ * Sensor Donut Card for Home Assistant v1.3.1
  * A customizable Lovelace card to display numeric sensors as donut charts
  * Now with manual alignment options!
  */
@@ -350,11 +350,14 @@ class SensorDonutCard extends LitElement {
               `left: ${alignH}; top: ${alignV};` : '';
 
             return html`
-              <div class="donut-item ${sizeClass} ${hasManualAlign ? 'manual-align' : ''}">
-                <div 
-                  class="donut-container"
-                  style="--donut-size: ${size}px; --donut-thickness: ${thickness}px; ${alignmentStyle} cursor: pointer;"
+              <div
+                class="donut-item ${sizeClass} ${hasManualAlign ? 'manual-align' : ''}"
+                style="cursor: pointer;"
                 @click="${() => this._handleDonutClick(donut.entity)}"
+              >
+                <div
+                  class="donut-container"
+                  style="--donut-size: ${size}px; --donut-thickness: ${thickness}px; ${alignmentStyle}"
                 >
                   <svg 
                     class="donut-svg" 
@@ -429,7 +432,7 @@ window.customCards.push({
 
 // Console info
 console.info(
-  `%c SENSOR-DONUT-CARD %c v1.2.0 `,
+  `%c SENSOR-DONUT-CARD %c v1.3.1 `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray'
 );
